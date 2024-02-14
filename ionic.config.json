@@ -1,0 +1,7 @@
+{
+  "name": "Random timer",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
