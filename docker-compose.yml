@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: docker.camionesoptimus.co/happy-timer-frontend:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - 3480:80
