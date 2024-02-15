@@ -26,13 +26,42 @@ export class HappyTimerPage implements OnInit {
   timerLabel = '00:00';
   timerIntervalId: any;
 
+  status: 'play' | 'pause' | 'stop' = 'stop';
+
+  public get showPlay(): boolean {
+    return this.status === 'pause' || this.status === 'stop';
+  }
+  public get showPause(): boolean {
+    return this.status === 'play';
+  }
+  public get showStop(): boolean {
+    return this.status === 'play' || this.status === 'pause';
+  }
+
+  public get showButtons(): boolean {
+    return this.selectedOptionsCounter > 1;
+  }
+
+  public get showMinsControl(): boolean {
+    return this.selectedOptionsCounter > 1;
+  }
+
+  readonly WARNING_SECONDS = 10;
+  readonly WARNING_SOUND = new Audio('/assets/sounds/beep.mp3');
+
   ngOnInit(): void {
-    this.runTimer();
+    this.setRandomValues();
   }
 
   runTimer() {
     this.stopTimer();
+    this.setRandomValues();
+    if (this.selectedOptionsCounter > 1) {
+      this.startTimer();
+    }
+  }
 
+  private setRandomValues() {
     this.selectedOptionsCounter = this.options.filter(option => option.value).length;
     this.randomIndex = 0;
     this.randomMinutes = 0;
@@ -43,19 +72,19 @@ export class HappyTimerPage implements OnInit {
 
     if (this.selectedOptionsCounter === 1) {
       this.randomIndex = this.options.findIndex(option => option.value);
+      this.currentOption = this.options[this.randomIndex];
       return;
     }
 
     // Get options but removing the ones not selected and the one in the randomIndex
-    const lastId = this.options;
-    const filteredOptions = this.options.filter((option, index) => option.value && option.id !== this.currentOption.id);
+    const filteredOptions = this.options.filter((option) => option.value && option.id !== this.currentOption.id);
 
     this.randomMinutes = Math.floor(Math.random() * this.maxMinutes) + 1;
     this.randomIndex = Math.floor(Math.random() * filteredOptions.length);
-
+    this.timerSecondsLeft = this.randomMinutes * 60;
     this.currentOption = filteredOptions[this.randomIndex];
 
-    this.startTimer()
+    this.updateTimerLabel();
   }
 
   private updateTimerLabel() {
@@ -67,12 +96,19 @@ export class HappyTimerPage implements OnInit {
 
   startTimer() {
     clearInterval(this.timerIntervalId);
+    this.status = 'play';
 
     this.timerIntervalId = setInterval(() => {
       this.timerSecondsLeft--;
 
       if (this.timerSecondsLeft <= 0) {
+        this.WARNING_SOUND.pause();
         this.runTimer();
+      }
+
+      if (this.timerSecondsLeft <= this.WARNING_SECONDS && this.WARNING_SOUND.paused) {
+        // Play sound
+        this.WARNING_SOUND.play();
       }
 
       this.updateTimerLabel();
@@ -81,11 +117,15 @@ export class HappyTimerPage implements OnInit {
 
   pauseTimer() {
     clearInterval(this.timerIntervalId);
+    this.WARNING_SOUND.pause();
+    this.status = 'pause';
   }
 
   stopTimer() {
     clearInterval(this.timerIntervalId);
+    this.WARNING_SOUND.pause();
     this.timerSecondsLeft = this.randomMinutes * 60;
-    this.timerLabel = `${this.randomMinutes.toString().padStart(2, '0')}:00`;
+    this.updateTimerLabel();
+    this.status = 'stop';
   }
 }

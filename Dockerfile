@@ -22,5 +22,8 @@ FROM nginx
 # Copy the build output to replace the default Nginx contents
 COPY --from=build /app/www /usr/share/nginx/html
 
+# Copy the Nginx configuration file to the container
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose the port that the app is running on
 EXPOSE 80
