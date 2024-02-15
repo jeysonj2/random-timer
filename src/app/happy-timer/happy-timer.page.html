@@ -33,7 +33,7 @@
                 <ion-card-title>{{ currentOption.label }}</ion-card-title>
               </ion-card-header>
               <ion-card-content>
-                <h1 *ngIf="selectedOptionsCounter == 1">🎵 All night long 🎶</h1>
+                <h1 *ngIf="selectedOptionsCounter === 1">🎵 All night long 🎶</h1>
                 <ion-text [color]="timerSecondsLeft > WARNING_SECONDS ? 'default' : 'danger'">
                   <h1 class="timer-label" *ngIf="selectedOptionsCounter > 1">{{ timerLabel }}</h1>
                 </ion-text>
